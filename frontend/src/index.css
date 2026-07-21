@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-dark-hero: #363830;
+    --bg-dark-container: #2b2d25;
+    --bg-dark-surface: #22241d;
+    --accent-lime: #dfff00;
+    --accent-lime-hover: #cbff00;
+    --text-on-lime: #181a14;
+    --card-light-bg: #ffffff;
+    --card-light-secondary: #f6f7f9;
+  }
+
+  body {
+    background-color: var(--bg-dark-hero);
+    color: #ffffff;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* Custom WorkPro Glassmorphic & Rounded Utilities */
+.workpro-hero-bg {
+  background-color: #363830;
+}
+
+.workpro-lime-btn {
+  background-color: #dfff00;
+  color: #181a14;
+  font-weight: 700;
+  transition: all 0.2s ease-in-out;
+}
+
+.workpro-lime-btn:hover {
+  background-color: #e5ff33;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px -5px rgba(223, 255, 0, 0.4);
+}
+
+.workpro-glass-pill {
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  backdrop-filter: blur(12px);
+  transition: all 0.2s ease;
+}
+
+.workpro-glass-pill:hover {
+  background-color: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.workpro-dashboard-frame {
+  background-color: #ffffff;
+  border-radius: 2rem;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.35);
+  color: #1e201b;
+}
+
+/* Shimmer Animation */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}

@@ -1,0 +1,111 @@
+datasource db {
+  provider = "sqlite"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                  String           @id @default(uuid())
+  email               String           @unique
+  passwordHash        String
+  themePreference     String           @default("dark")
+  onboardingCompleted Boolean          @default(false)
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  apiKeys             ApiKey[]
+  socialAccounts      SocialAccount[]
+  generations         Generation[]
+  posts               Post[]
+  campaigns           Campaign[]
+
+  @@map("users")
+}
+
+model ApiKey {
+  id           String   @id @default(uuid())
+  userId       String
+  provider     String   // "gemini" | "openai"
+  encryptedKey String   // AES-256 encrypted at rest
+  addedAt      DateTime @default(now())
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, provider])
+  @@map("api_keys")
+}
+
+model SocialAccount {
+  id                      String    @id @default(uuid())
+  userId                  String
+  platform                String    // "instagram" | "facebook" | "twitter" | "reddit" | "tiktok"
+  platformUsername        String?
+  accessTokenEncrypted    String
+  refreshTokenEncrypted   String?
+  expiresAt               DateTime?
+  extraCredentialsJson    String?   // Page ID, Zernio Key, Subreddit settings
+  linkedAt                DateTime  @default(now())
+
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, platform])
+  @@map("social_accounts")
+}
+
+model Generation {
+  id                String   @id @default(uuid())
+  userId            String
+  prompt            String
+  tone              String
+  platform          String   @default("multi")
+  captionsJson      String   // JSON array of generated caption variations (2-3 options)
+  generatedImageUrl String?
+  providerUsed      String   // "gemini" | "openai"
+  createdAt         DateTime @default(now())
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  posts             Post[]
+
+  @@map("generations")
+}
+
+model Post {
+  id             String    @id @default(uuid())
+  userId         String
+  generationId   String?
+  campaignId     String?
+  platform       String    // "instagram" | "facebook" | "twitter" | "reddit" | "tiktok"
+  caption        String
+  imageUrl       String?
+  status         String    @default("draft") // "draft" | "scheduled" | "published" | "failed"
+  scheduledFor   DateTime?
+  publishedAt    DateTime?
+  platformPostId String?
+  permalink      String?
+  errorMessage   String?
+  createdAt      DateTime  @default(now())
+
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  generation     Generation? @relation(fields: [generationId], references: [id], onDelete: SetNull)
+  campaign       Campaign?   @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+
+  @@index([userId, status])
+  @@index([scheduledFor])
+  @@map("posts")
+}
+
+model Campaign {
+  id        String   @id @default(uuid())
+  userId    String
+  name      String
+  color     String   @default("bg-indigo-500")
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  posts     Post[]
+
+  @@unique([userId, name])
+  @@map("campaigns")
+}
