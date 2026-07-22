@@ -41,20 +41,23 @@ export const TopNavbar: React.FC = () => {
 
         {/* Centered Sleek Tabs */}
         {!isAuthPage && (
-          <nav className="hidden md:flex items-center gap-2 bg-white/5 p-2 rounded-full border border-white/10">
+          <nav className="hidden md:flex items-center gap-10">
             {navItems.map((item) => {
               const isActive = activeTab === item.id;
               return (
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`flex items-center px-6 py-2.5 text-sm font-semibold rounded-full transition-all duration-200 ${
+                  className={`relative flex items-center py-1 text-[15px] font-medium transition-colors duration-200 ${
                     isActive
-                      ? 'bg-[#dfff00] text-[#181a14] shadow-md font-bold'
-                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                      ? 'text-[#dfff00]'
+                      : 'text-white/70 hover:text-white'
                   }`}
                 >
                   {item.label}
+                  {isActive && (
+                    <span className="absolute -bottom-2 left-0 w-full h-[3px] bg-[#dfff00] rounded-full" />
+                  )}
                 </button>
               );
             })}
