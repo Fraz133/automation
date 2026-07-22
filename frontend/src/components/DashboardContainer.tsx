@@ -2,6 +2,7 @@ import React from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { CreatorStudio } from './CreatorStudio';
 import { ApiKeysView } from './ApiKeysView';
+import { CalendarView } from './CalendarView';
 
 export const DashboardContainer: React.FC = () => {
   const { activeTab } = useAppStore();
@@ -76,7 +77,8 @@ export const DashboardContainer: React.FC = () => {
           {/* Other Tabs */}
           {activeTab === 'studio' && <CreatorStudio />}
           {activeTab === 'keys' && <ApiKeysView />}
-          {activeTab !== 'home' && activeTab !== 'studio' && activeTab !== 'keys' && (
+          {activeTab === 'calendar' && <CalendarView />}
+          {activeTab !== 'home' && activeTab !== 'studio' && activeTab !== 'keys' && activeTab !== 'calendar' && (
             <div className="p-16 text-center text-slate-500 flex-1 flex flex-col items-center justify-center">
               <h3 className="text-2xl font-bold text-slate-800 mb-4 capitalize">{activeTab} Workspace</h3>
               <p className="text-sm font-medium">Module ready and connected to backend API endpoints.</p>

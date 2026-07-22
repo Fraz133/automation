@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAppStore } from '../store/useAppStore';
-import { Lock, Mail, ArrowRight, AlertCircle, RefreshCw } from 'lucide-react';
+import { Lock, Mail, ArrowRight, AlertCircle, RefreshCw, User } from 'lucide-react';
 
 export const AuthPage: React.FC = () => {
   const { setToken, setUser, activeTab, setActiveTab } = useAppStore();
   const mode = activeTab === 'login' || activeTab === 'signup' ? activeTab : 'login';
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,7 +24,8 @@ export const AuthPage: React.FC = () => {
     const endpoint = mode === 'signup' ? '/api/auth/register' : '/api/auth/login';
 
     try {
-      const resp = await axios.post(endpoint, { email, password });
+      const payload = mode === 'signup' ? { name, email, password } : { email, password };
+      const resp = await axios.post(endpoint, payload);
       if (resp.data?.success) {
         setToken(resp.data.token);
         setUser(resp.data.user);
@@ -65,6 +67,25 @@ export const AuthPage: React.FC = () => {
         )}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-6 w-full max-w-md mx-auto">
+          {mode === 'signup' && (
+            <div className="space-y-2">
+              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest pl-1">
+                Company / Creator Name
+              </label>
+              <div className="flex items-center gap-3 px-4 py-4 bg-slate-50/50 border border-slate-200 rounded-2xl focus-within:border-slate-900 focus-within:ring-1 focus-within:ring-slate-900 transition-all duration-300">
+                <User size={18} className="text-slate-400" />
+                <input
+                  type="text"
+                  required={mode === 'signup'}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Your Name or Brand"
+                  className="w-full bg-transparent text-sm text-slate-900 focus:outline-none font-medium placeholder:text-slate-400"
+                />
+              </div>
+            </div>
+          )}
+
           <div className="space-y-2">
             <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest pl-1">
               Email Address

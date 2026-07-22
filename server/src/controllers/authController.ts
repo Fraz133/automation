@@ -8,6 +8,7 @@ import { AuthenticatedRequest } from '../middleware/auth.js';
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-jwt-key-social-automation-saas-2026';
 
 const RegisterSchema = z.object({
+  name: z.string().min(2),
   email: z.string().email(),
   password: z.string().min(8),
 });
@@ -19,7 +20,7 @@ const LoginSchema = z.object({
 
 export async function register(req: AuthenticatedRequest, res: Response) {
   try {
-    const { email, password } = RegisterSchema.parse(req.body);
+    const { name, email, password } = RegisterSchema.parse(req.body);
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -29,6 +30,7 @@ export async function register(req: AuthenticatedRequest, res: Response) {
     const passwordHash = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
       data: {
+        name,
         email,
         passwordHash,
       },
@@ -49,6 +51,7 @@ export async function register(req: AuthenticatedRequest, res: Response) {
       token,
       user: {
         id: user.id,
+        name: user.name,
         email: user.email,
         themePreference: user.themePreference,
         onboardingCompleted: user.onboardingCompleted,
@@ -88,6 +91,7 @@ export async function login(req: AuthenticatedRequest, res: Response) {
       token,
       user: {
         id: user.id,
+        name: user.name,
         email: user.email,
         themePreference: user.themePreference,
         onboardingCompleted: user.onboardingCompleted,
@@ -108,6 +112,7 @@ export async function me(req: AuthenticatedRequest, res: Response) {
       where: { id: req.user.userId },
       select: {
         id: true,
+        name: true,
         email: true,
         themePreference: true,
         onboardingCompleted: true,
