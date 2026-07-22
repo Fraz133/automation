@@ -64,7 +64,7 @@ export const CalendarView: React.FC = () => {
         </div>
       </div>
       
-      <div className="flex-1 bg-slate-50/50 rounded-3xl border border-slate-200 overflow-hidden shadow-sm p-6">
+      <div className="flex-1 bg-slate-50/50 rounded-3xl border border-slate-200 overflow-hidden shadow-sm p-6 flex flex-col min-h-[600px]">
         <style>
           {`
             .rbc-calendar { font-family: inherit; }
@@ -115,7 +115,7 @@ export const CalendarView: React.FC = () => {
           components={{
             event: CustomEvent
           }}
-          className="h-full"
+          className="flex-1"
         />
       </div>
     </div>
