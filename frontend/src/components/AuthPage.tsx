@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAppStore } from '../store/useAppStore';
-import { Lock, Mail, ArrowRight, AlertCircle, RefreshCw, User } from 'lucide-react';
+import { Lock, Mail, ArrowRight, AlertCircle, RefreshCw, User, Eye, EyeOff } from 'lucide-react';
 
 export const AuthPage: React.FC = () => {
   const { setToken, setUser, activeTab, setActiveTab } = useAppStore();
@@ -9,6 +9,8 @@ export const AuthPage: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -20,6 +22,46 @@ export const AuthPage: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    // Check for empty fields first
+    if (!email.trim() || !password.trim() || (mode === 'signup' && (!name.trim() || !confirmPassword.trim()))) {
+      setError('Please fill out all required fields.');
+      setLoading(false);
+      return;
+    }
+
+    // Comprehensive frontend validation
+    if (mode === 'signup' && name.trim().length < 2) {
+      setError('Name must be at least 2 characters');
+      setLoading(false);
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Invalid email address');
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters');
+      setLoading(false);
+      return;
+    }
+
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (mode === 'signup' && !strongPasswordRegex.test(password)) {
+      setError('Password must contain uppercase, lowercase, number, and special character');
+      setLoading(false);
+      return;
+    }
+
+    if (mode === 'signup' && password !== confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
 
     const endpoint = mode === 'signup' ? '/api/auth/register' : '/api/auth/login';
 
@@ -66,7 +108,7 @@ export const AuthPage: React.FC = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6 w-full max-w-md mx-auto">
+        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-6 w-full max-w-md mx-auto">
           {mode === 'signup' && (
             <div className="space-y-2">
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest pl-1">
@@ -110,15 +152,41 @@ export const AuthPage: React.FC = () => {
             <div className="flex items-center gap-3 px-4 py-4 bg-slate-50/50 border border-slate-200 rounded-2xl focus-within:border-slate-900 focus-within:ring-1 focus-within:ring-slate-900 transition-all duration-300">
               <Lock size={18} className="text-slate-400" />
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 className="w-full bg-transparent text-sm text-slate-900 focus:outline-none font-medium placeholder:text-slate-400"
               />
+              <button 
+                type="button" 
+                onClick={() => setShowPassword(!showPassword)}
+                className="text-slate-400 hover:text-slate-600 focus:outline-none"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
+
+          {mode === 'signup' && (
+            <div className="space-y-2">
+              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest pl-1">
+                Confirm Password
+              </label>
+              <div className="flex items-center gap-3 px-4 py-4 bg-slate-50/50 border border-slate-200 rounded-2xl focus-within:border-slate-900 focus-within:ring-1 focus-within:ring-slate-900 transition-all duration-300">
+                <Lock size={18} className="text-slate-400" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required={mode === 'signup'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full bg-transparent text-sm text-slate-900 focus:outline-none font-medium placeholder:text-slate-400"
+                />
+              </div>
+            </div>
+          )}
 
           <button
             type="submit"
