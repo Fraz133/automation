@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useAppStore } from '../store/useAppStore';
 
 export const ApiKeysView: React.FC = () => {
-  const { geminiKey, setGeminiKey, openaiKey, setOpenaiKey } = useAppStore();
+  const { geminiKey, setGeminiKey, openaiKey, setOpenaiKey, user, setActiveTab } = useAppStore();
 
   const [inputGemini, setInputGemini] = useState(geminiKey);
   const [inputOpenai, setInputOpenai] = useState(openaiKey);
@@ -19,6 +19,13 @@ export const ApiKeysView: React.FC = () => {
   });
 
   const handleVerifyAndSave = async () => {
+    if (!user) {
+      setGeminiKey(inputGemini);
+      setOpenaiKey(inputOpenai);
+      setActiveTab('login');
+      return;
+    }
+
     setVerifying(true);
     setGeminiStatus({ ok: null, error: '' });
     setOpenaiStatus({ ok: null, error: '' });

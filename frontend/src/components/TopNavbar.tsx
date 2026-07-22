@@ -3,7 +3,7 @@ import { useAppStore } from '../store/useAppStore';
 import type { NavTab } from '../types';
 
 export const TopNavbar: React.FC = () => {
-  const { activeTab, setActiveTab, user, setToken, setUser } = useAppStore();
+  const { activeTab, setActiveTab, user, setToken, setUser, setScheduledPosts } = useAppStore();
 
   const navItems: { id: NavTab; label: string }[] = [
     { id: 'home', label: 'Home' },
@@ -11,12 +11,24 @@ export const TopNavbar: React.FC = () => {
     { id: 'calendar', label: 'Calendar' },
     { id: 'accounts', label: 'Social Hub' },
     { id: 'keys', label: 'API Keys' },
-    { id: 'settings', label: 'Settings' },
   ];
+
+  if (user && activeTab !== 'login' && activeTab !== 'signup') {
+    navItems.push({ id: 'settings', label: 'Settings' });
+  }
+
+  const handleTabClick = (id: NavTab) => {
+    if (!user && (id === 'calendar' || id === 'accounts' || id === 'settings')) {
+      setActiveTab('login');
+    } else {
+      setActiveTab(id);
+    }
+  };
 
   const handleLogout = () => {
     setToken(null);
     setUser(null);
+    setScheduledPosts([]);
     setActiveTab('home');
   };
 
@@ -47,7 +59,7 @@ export const TopNavbar: React.FC = () => {
               return (
                 <button
                   key={item.id}
-                  onClick={() => setActiveTab(item.id)}
+                  onClick={() => handleTabClick(item.id)}
                   className={`relative flex items-center py-1 text-[15px] font-medium transition-colors duration-200 ${
                     isActive
                       ? 'text-[#dfff00]'

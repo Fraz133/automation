@@ -91,31 +91,6 @@ export const useAppStore = create<AppState>((set) => ({
   theme: 'dark',
   toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
 
-  scheduledPosts: [
-    {
-      id: 'mock-1',
-      caption: 'Stay hydrated and smart! Introducing the revolutionary SmartBottle 💧✨',
-      platforms: ['instagram', 'facebook'],
-      status: 'scheduled',
-      scheduledFor: new Date(new Date().setHours(14, 0, 0, 0)).toISOString(), // Today at 2pm
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'mock-2',
-      caption: 'Excited to announce our new eco-friendly features. Check out the link in bio! 🌿',
-      platforms: ['twitter'],
-      status: 'scheduled',
-      scheduledFor: new Date(new Date().setDate(new Date().getDate() + 2)).toISOString(), // In 2 days
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'mock-3',
-      caption: 'Meet your new favorite everyday carry. Lightweight, 100% recycled steel. ♻️',
-      platforms: ['tiktok'],
-      status: 'scheduled',
-      scheduledFor: new Date(new Date().setDate(new Date().getDate() + 5)).toISOString(), // In 5 days
-      createdAt: new Date().toISOString(),
-    }
-  ],
+  scheduledPosts: [],
   setScheduledPosts: (posts) => set({ scheduledPosts: posts }),
 }));

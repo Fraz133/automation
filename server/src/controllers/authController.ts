@@ -8,9 +8,11 @@ import { AuthenticatedRequest } from '../middleware/auth.js';
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-jwt-key-social-automation-saas-2026';
 
 const RegisterSchema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
-  password: z.string().min(8),
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  password: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, 'Password must contain uppercase, lowercase, number, and special character'),
 });
 
 const LoginSchema = z.object({
@@ -58,6 +60,9 @@ export async function register(req: AuthenticatedRequest, res: Response) {
       },
     });
   } catch (error: any) {
+    if (error && error.errors && Array.isArray(error.errors)) {
+      return res.status(400).json({ success: false, message: error.errors.map((e: any) => e.message).join(', ') });
+    }
     return res.status(400).json({ success: false, message: error.message || 'Registration failed' });
   }
 }
@@ -98,6 +103,9 @@ export async function login(req: AuthenticatedRequest, res: Response) {
       },
     });
   } catch (error: any) {
+    if (error && error.errors && Array.isArray(error.errors)) {
+      return res.status(400).json({ success: false, message: error.errors.map((e: any) => e.message).join(', ') });
+    }
     return res.status(400).json({ success: false, message: error.message || 'Login failed' });
   }
 }
