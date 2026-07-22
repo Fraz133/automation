@@ -6,6 +6,7 @@ export type Platform = 'instagram' | 'facebook' | 'twitter' | 'reddit' | 'tiktok
 
 export interface User {
   id: string;
+  name: string;
   email: string;
   themePreference: 'dark' | 'light' | 'system';
   onboardingCompleted: boolean;

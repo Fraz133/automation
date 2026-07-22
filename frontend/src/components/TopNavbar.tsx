@@ -66,7 +66,7 @@ export const TopNavbar: React.FC = () => {
           {user ? (
             <div className="flex items-center gap-4">
               <span className="hidden sm:inline text-sm font-medium text-white/80 px-4 py-2 rounded-full border border-white/10">
-                {user.email}
+                {user.name || user.email}
               </span>
               <button
                 onClick={handleLogout}

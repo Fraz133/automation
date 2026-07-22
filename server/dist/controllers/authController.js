@@ -1,0 +1,112 @@
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { z } from 'zod';
+import { prisma } from '../lib/prisma.js';
+const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-jwt-key-social-automation-saas-2026';
+const RegisterSchema = z.object({
+    email: z.string().email(),
+    password: z.string().min(8),
+});
+const LoginSchema = z.object({
+    email: z.string().email(),
+    password: z.string().min(8),
+});
+export async function register(req, res) {
+    try {
+        const { email, password } = RegisterSchema.parse(req.body);
+        const existingUser = await prisma.user.findUnique({ where: { email } });
+        if (existingUser) {
+            return res.status(400).json({ success: false, message: 'User with this email already exists' });
+        }
+        const passwordHash = await bcrypt.hash(password, 10);
+        const user = await prisma.user.create({
+            data: {
+                email,
+                passwordHash,
+            },
+        });
+        const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+        return res.status(201).json({
+            success: true,
+            message: 'Account created successfully',
+            token,
+            user: {
+                id: user.id,
+                email: user.email,
+                themePreference: user.themePreference,
+                onboardingCompleted: user.onboardingCompleted,
+            },
+        });
+    }
+    catch (error) {
+        return res.status(400).json({ success: false, message: error.message || 'Registration failed' });
+    }
+}
+export async function login(req, res) {
+    try {
+        const { email, password } = LoginSchema.parse(req.body);
+        const user = await prisma.user.findUnique({ where: { email } });
+        if (!user) {
+            return res.status(401).json({ success: false, message: 'Invalid email or password' });
+        }
+        const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+        if (!isValidPassword) {
+            return res.status(401).json({ success: false, message: 'Invalid email or password' });
+        }
+        const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+        return res.json({
+            success: true,
+            message: 'Logged in successfully',
+            token,
+            user: {
+                id: user.id,
+                email: user.email,
+                themePreference: user.themePreference,
+                onboardingCompleted: user.onboardingCompleted,
+            },
+        });
+    }
+    catch (error) {
+        return res.status(400).json({ success: false, message: error.message || 'Login failed' });
+    }
+}
+export async function me(req, res) {
+    try {
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: 'Unauthorized' });
+        }
+        const user = await prisma.user.findUnique({
+            where: { id: req.user.userId },
+            select: {
+                id: true,
+                email: true,
+                themePreference: true,
+                onboardingCompleted: true,
+                createdAt: true,
+            },
+        });
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        return res.json({ success: true, user });
+    }
+    catch (error) {
+        return res.status(500).json({ success: false, message: 'Failed to fetch user' });
+    }
+}
+export async function logout(req, res) {
+    res.clearCookie('token');
+    return res.json({ success: true, message: 'Logged out successfully' });
+}
