@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Platform } from '../types';
 import { Heart, MessageCircle, Share2, Bookmark, MoreHorizontal, Repeat2, Send, ArrowUp, ArrowDown, Music, ThumbsUp, Search, Globe } from 'lucide-react';
+import { useAppStore } from '../store/useAppStore';
 
 interface PlatformPreviewsProps {
   caption: string;
@@ -13,6 +14,11 @@ export const PlatformPreviews: React.FC<PlatformPreviewsProps> = ({
   imageUrl,
   activePlatform,
 }) => {
+  const { user } = useAppStore();
+  
+  const userName = user?.name || 'workpro_official';
+  const userInitials = userName.substring(0, 2).toUpperCase();
+  const userHandle = `@${userName.toLowerCase().replace(/\s+/g, '_')}`;
 
   const renderInstagram = () => (
     <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-lg max-w-md mx-auto text-slate-900">
@@ -22,12 +28,12 @@ export const PlatformPreviews: React.FC<PlatformPreviewsProps> = ({
           <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 p-[2px]">
             <div className="w-full h-full bg-white rounded-full p-[1px]">
               <div className="w-full h-full bg-slate-900 rounded-full flex items-center justify-center text-[10px] font-bold text-white">
-                WP
+                {userInitials}
               </div>
             </div>
           </div>
           <div>
-            <p className="text-xs font-bold leading-none">workpro_official</p>
+            <p className="text-xs font-bold leading-none">{userName}</p>
             <p className="text-[10px] text-slate-500">Sponsored</p>
           </div>
         </div>
@@ -61,7 +67,7 @@ export const PlatformPreviews: React.FC<PlatformPreviewsProps> = ({
 
         {/* Caption */}
         <p className="text-xs text-slate-800 leading-relaxed whitespace-pre-wrap">
-          <span className="font-bold mr-1.5">workpro_official</span>
+          <span className="font-bold mr-1.5">{userName}</span>
           {caption}
         </p>
 
@@ -75,10 +81,10 @@ export const PlatformPreviews: React.FC<PlatformPreviewsProps> = ({
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2.5">
           <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs">
-            WP
+            {userInitials}
           </div>
           <div>
-            <p className="text-xs font-bold leading-none">WorkPro Automation</p>
+            <p className="text-xs font-bold leading-none">{userName}</p>
             <p className="text-[10px] text-slate-500 mt-0.5 flex items-center gap-1">Just now <Globe size={10} /></p>
           </div>
         </div>
@@ -123,12 +129,12 @@ export const PlatformPreviews: React.FC<PlatformPreviewsProps> = ({
 
         <div className="flex items-start gap-3">
           <div className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center font-bold text-xs">
-            X
+            {userInitials}
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-bold">WorkPro</span>
-              <span className="text-xs text-slate-500">@workpro_app · 1m</span>
+              <span className="text-xs font-bold">{userName}</span>
+              <span className="text-xs text-slate-500">{userHandle} · 1m</span>
             </div>
 
             <p className="text-xs text-slate-200 mt-1 whitespace-pre-wrap leading-relaxed">{caption}</p>
@@ -155,7 +161,7 @@ export const PlatformPreviews: React.FC<PlatformPreviewsProps> = ({
     <div className="bg-white rounded-2xl border border-slate-200 p-4 max-w-md mx-auto shadow-lg text-slate-900">
       <div className="flex items-center gap-2 text-[11px] text-slate-500 mb-2">
         <span className="font-bold text-orange-600">r/SocialMediaMarketing</span>
-        <span>• Posted by u/WorkProDev 3 hours ago</span>
+        <span>• Posted by u/{userName.replace(/\s+/g, '')} 3 hours ago</span>
       </div>
 
       <h3 className="text-sm font-bold text-slate-900 mb-2">Automate your entire campaign workflow with BYOK AI keys</h3>
@@ -197,7 +203,7 @@ export const PlatformPreviews: React.FC<PlatformPreviewsProps> = ({
       {/* Right Action Bar */}
       <div className="relative z-10 self-end flex flex-col items-center gap-4 text-white text-xs font-semibold">
         <div className="w-9 h-9 rounded-full bg-[#dfff00] text-slate-900 font-bold flex items-center justify-center shadow-lg">
-          WP
+          {userInitials}
         </div>
         <div className="flex flex-col items-center gap-0.5"><Heart size={22} /> 12.4K</div>
         <div className="flex flex-col items-center gap-0.5"><MessageCircle size={22} /> 842</div>
@@ -210,10 +216,10 @@ export const PlatformPreviews: React.FC<PlatformPreviewsProps> = ({
 
       {/* Bottom Caption Overlay */}
       <div className="relative z-10 text-left bg-gradient-to-t from-black/90 via-black/40 to-transparent p-2 rounded-xl">
-        <p className="text-xs font-bold mb-1">@workpro_app</p>
+        <p className="text-xs font-bold mb-1">{userHandle}</p>
         <p className="text-[11px] text-slate-200 line-clamp-3 leading-relaxed">{caption}</p>
         <div className="flex items-center gap-2 mt-2 text-[10px] text-slate-300">
-          <Music size={12} /> <span>Original Sound - WorkPro AI Studio</span>
+          <Music size={12} /> <span>Original Sound - {userName}</span>
         </div>
       </div>
     </div>
